@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuahApp — Klasifikasi Kematangan Buah</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --green-900: #14532d;
+            --green-700: #15803d;
+            --green-500: #22c55e;
+            --green-400: #4ade80;
+            --green-100: #dcfce7;
+            --green-50:  #f0fdf4;
+            --amber-500: #f59e0b;
+            --amber-100: #fef3c7;
+            --red-500:   #ef4444;
+            --red-100:   #fee2e2;
+            --slate-900: #0f172a;
+            --slate-700: #334155;
+            --slate-500: #64748b;
+            --slate-300: #cbd5e1;
+            --slate-100: #f1f5f9;
+            --slate-50:  #f8fafc;
+            --white:     #ffffff;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.05);
+            --shadow-md: 0 4px 16px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.05);
+            --shadow-lg: 0 16px 48px rgba(0,0,0,.10), 0 4px 16px rgba(0,0,0,.06);
+        }
+
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--slate-100);
+            min-height: 100vh;
+            color: var(--slate-900);
+        }
+
+        /* ── TOP BAR ── */
+        .topbar {
+            background: var(--white);
+            border-bottom: 1px solid var(--slate-300);
+            padding: 0 40px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .topbar-logo {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--green-700);
+            letter-spacing: -0.5px;
+        }
+        .topbar-badge {
+            font-size: 11px;
+            font-weight: 600;
+            background: var(--green-100);
+            color: var(--green-700);
+            padding: 2px 8px;
+            border-radius: 99px;
+            letter-spacing: .3px;
+        }
+
+        /* ── PAGE LAYOUT ── */
+        .page {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 40px 24px 80px;
+        }
+
+        /* ── HERO ── */
+        .hero {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--green-700);
+            margin-bottom: 14px;
+        }
+        .hero-eyebrow span {
+            display: inline-block;
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--green-500);
+        }
+        .hero h1 {
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: var(--slate-900);
+            line-height: 1.15;
+        }
+        .hero h1 em {
+            font-style: normal;
+            color: var(--green-700);
+        }
+        .hero-sub {
+            margin-top: 10px;
+            font-size: 15px;
+            color: var(--slate-500);
+        }
+
+        /* ── UPLOAD CARD ── */
+        .upload-card {
+            background: var(--white);
+            border: 2px dashed var(--slate-300);
+            border-radius: var(--radius-lg);
+            padding: 36px 28px;
+            text-align: center;
+            transition: border-color .2s, background .2s;
+            cursor: pointer;
+            position: relative;
+            margin-bottom: 32px;
+        }
+        .upload-card:hover {
+            border-color: var(--green-500);
+            background: var(--green-50);
+        }
+        .upload-card input[type=file] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+        .upload-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .upload-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--slate-700);
+        }
+        .upload-hint {
+            font-size: 13px;
+            color: var(--slate-500);
+            margin-top: 4px;
+        }
+        .file-name {
+            margin-top: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--green-700);
+            background: var(--green-50);
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 99px;
+        }
+
+        /* ── SUBMIT BTN ── */
+        .btn-scan {
+            display: block;
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto 40px;
+            background: var(--green-700);
+            color: var(--white);
+            border: none;
+            padding: 14px 28px;
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: .3px;
+            cursor: pointer;
+            transition: background .2s, transform .1s, box-shadow .2s;
+            box-shadow: 0 4px 14px rgba(21,128,61,.25);
+        }
+        .btn-scan:hover {
+            background: var(--green-900);
+            box-shadow: 0 6px 20px rgba(21,128,61,.35);
+            transform: translateY(-1px);
+        }
+        .btn-scan:active { transform: translateY(0); }
+
+        /* ── DIVIDER ── */
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: var(--slate-500);
+            margin-bottom: 16px;
+        }
+
+        /* ── IMAGE COMPARE ── */
+        .image-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+        .img-card {
+            background: var(--white);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            border: 1px solid var(--slate-300);
+        }
+        .img-card-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--slate-100);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .img-card-header .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--slate-300);
+        }
+        .img-card-header .dot.green { background: var(--green-500); }
+        .img-card-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--slate-700);
+        }
+        .img-card img {
+            width: 100%;
+            display: block;
+            object-fit: cover;
+            max-height: 280px;
+        }
+
+        /* ── STATS ROW ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .stat-chip {
+            background: var(--white);
+            border: 1px solid var(--slate-300);
+            border-radius: var(--radius-md);
+            padding: 18px 20px;
+            box-shadow: var(--shadow-sm);
+        }
+        .stat-chip-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--slate-500);
+            margin-bottom: 6px;
+        }
+        .stat-chip-value {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--slate-900);
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: -1px;
+        }
+        .stat-chip-value.green { color: var(--green-700); }
+
+        /* ── TABLE ── */
+        .result-table-wrap {
+            background: var(--white);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            border: 1px solid var(--slate-300);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        thead th {
+            background: var(--green-700);
+            color: var(--white);
+            padding: 14px 18px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            text-align: left;
+        }
+        thead th:last-child { text-align: right; }
+        tbody tr {
+            border-bottom: 1px solid var(--slate-100);
+            transition: background .15s;
+        }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: var(--slate-50); }
+        tbody td {
+            padding: 14px 18px;
+            font-size: 14px;
+            color: var(--slate-700);
+        }
+        tbody td:last-child { text-align: right; }
+
+        .td-no {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--slate-500);
+            font-weight: 600;
+        }
+        .td-fruit {
+            font-weight: 700;
+            color: var(--slate-900);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .fruit-icon {
+            font-size: 18px;
+        }
+
+        /* ── RIPENESS BADGE ── */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .3px;
+        }
+        .badge::before {
+            content: '';
+            display: inline-block;
+            width: 6px; height: 6px;
+            border-radius: 50%;
+        }
+        .badge-ripe    { background: var(--green-100); color: var(--green-900); }
+        .badge-ripe::before    { background: var(--green-500); }
+        .badge-unripe  { background: var(--amber-100); color: #78350f; }
+        .badge-unripe::before  { background: var(--amber-500); }
+        .badge-rotten  { background: var(--red-100);   color: #7f1d1d; }
+        .badge-rotten::before  { background: var(--red-500); }
+
+        /* ── CONFIDENCE BAR ── */
+        .conf-wrap { display: flex; align-items: center; gap: 10px; justify-content: flex-end; }
+        .conf-bar-bg {
+            width: 80px; height: 6px;
+            background: var(--slate-100);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+        .conf-bar-fill {
+            height: 100%;
+            border-radius: 99px;
+            background: var(--green-500);
+            transition: width .5s ease;
+        }
+        .conf-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--slate-700);
+            min-width: 50px;
+            text-align: right;
+        }
+
+        /* ── EMPTY STATE ── */
+        .empty-state {
+            background: var(--white);
+            border: 1px solid var(--slate-300);
+            border-radius: var(--radius-md);
+            padding: 48px 32px;
+            text-align: center;
+        }
+        .empty-state-icon { font-size: 48px; margin-bottom: 16px; }
+        .empty-state-title { font-size: 18px; font-weight: 700; color: var(--slate-900); margin-bottom: 6px; }
+        .empty-state-sub { font-size: 14px; color: var(--slate-500); }
+
+        @media (max-width: 640px) {
+            .image-grid { grid-template-columns: 1fr; }
+            .stats-row  { grid-template-columns: 1fr 1fr; }
+            .hero h1    { font-size: 26px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="topbar">
+    <span class="topbar-logo">🍏🍎🍌🍊 BuahApp</span>
+    <span class="topbar-badge">Klasifikasi Buah</span>
+</nav>
+
+<div class="page">
+
+    <!-- HERO -->
+    <div class="hero">
+        <h1>Klasifikasi <em>Tingkat Kematangan</em> Buah</h1>
+        <p class="hero-sub">Upload foto buah — sistem akan mendeteksi jenis dan tingkat kematangannya secara otomatis.</p>
+    </div>
+
+    <!-- UPLOAD FORM -->
+    <form method="POST" enctype="multipart/form-data" id="uploadForm">
+        <div class="upload-card" id="dropZone">
+            <input type="file" name="image" accept="image/*" required id="fileInput">
+            <span class="upload-icon">📂</span>
+            <div class="upload-label">Klik atau seret gambar ke sini</div>
+            <div class="upload-hint">PNG, JPG, WEBP hingga 10 MB</div>
+            <div class="file-name" id="fileName" style="display:none"></div>
+        </div>
+        <button type="submit" class="btn-scan">🔍 Scan Buah</button>
+    </form>
+
+    <!-- RESULTS -->
+    {% if image_file %}
+
+    <!-- IMAGE COMPARE -->
+    <div class="section-label">Hasil Deteksi</div>
+    <div class="image-grid">
+        <div class="img-card">
+            <div class="img-card-header">
+                <div class="dot"></div>
+                <span class="img-card-title">Gambar Asli</span>
+            </div>
+            <img src="{{ image_file }}" alt="Gambar asli">
+        </div>
+        {% if detected_image %}
+        <div class="img-card">
+            <div class="img-card-header">
+                <div class="dot green"></div>
+                <span class="img-card-title">Hasil Deteksi YOLO</span>
+            </div>
+            <img src="{{ detected_image }}" alt="Deteksi YOLO">
+        </div>
+        {% endif %}
+    </div>
+
+    {% if predictions|length == 0 %}
+
+    <!-- EMPTY STATE -->
+    <div class="empty-state">
+        <div class="empty-state-icon">🔍</div>
+        <div class="empty-state-title">Buah Tidak Terdeteksi</div>
+        <div class="empty-state-sub">Pastikan gambar mengandung buah yang jelas (pisang, apel, atau jeruk).</div>
+    </div>
+
+    {% else %}
+
+    <!-- STATS ROW -->
+    {% set ripe_count   = predictions | selectattr('ripeness','equalto','ripe')   | list | length %}
+    {% set unripe_count = predictions | selectattr('ripeness','equalto','unripe') | list | length %}
+    {% set rotten_count = predictions | selectattr('ripeness','equalto','rotten') | list | length %}
+    <div class="stats-row">
+        <div class="stat-chip">
+            <div class="stat-chip-label">Total Terdeteksi</div>
+            <div class="stat-chip-value green">{{ predictions|length }}</div>
+        </div>
+        <div class="stat-chip">
+            <div class="stat-chip-label">Matang / Belum</div>
+            <div class="stat-chip-value">{{ ripe_count }} / {{ unripe_count }}</div>
+        </div>
+        <div class="stat-chip">
+            <div class="stat-chip-label">Conf. Tertinggi</div>
+            <div class="stat-chip-value">{{ "%.0f"|format((predictions | map(attribute='confidence') | max) * 100) }}%</div>
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="section-label">Detail Per Buah</div>
+    <div class="result-table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Jenis Buah</th>
+                    <th>Kematangan</th>
+                    <th>Confidence</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in predictions %}
+                {% set fruit_lower = item.fruit | lower %}
+                <tr>
+                    <td class="td-no">{{ "%02d"|format(loop.index) }}</td>
+                    <td>
+                        <div class="td-fruit">
+                            <span class="fruit-icon">
+                                {% if fruit_lower == 'banana' %}🍌
+                                {% elif fruit_lower == 'apple' %}🍎
+                                {% elif fruit_lower == 'orange' %}🍊
+                                {% else %}🍑{% endif %}
+                            </span>
+                            {{ item.fruit | capitalize }}
+                        </div>
+                    </td>
+                    <td>
+                        {% set r = item.ripeness | lower %}
+                        <span class="badge badge-{{ r }}">
+                            {% if r == 'ripe' %}Matang
+                            {% elif r == 'unripe' %}Belum Matang
+                            {% else %}Busuk{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="conf-wrap">
+                            <div class="conf-bar-bg">
+                                <div class="conf-bar-fill" style="width:{{ (item.confidence * 100)|round|int }}%"></div>
+                            </div>
+                            <span class="conf-text">{{ "%.1f"|format(item.confidence * 100) }}%</span>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% endif %}
+    {% endif %}
+
+</div>
+
+<script>
+    const input    = document.getElementById('fileInput');
+    const fileName = document.getElementById('fileName');
+
+    input.addEventListener('change', () => {
+        if (input.files.length) {
+            fileName.textContent = '📄 ' + input.files[0].name;
+            fileName.style.display = 'inline-block';
+        }
+    });
+</script>
+
+</body>
+</html>
