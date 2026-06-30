@@ -1,0 +1,6 @@
+flask
+tensorflow
+ultralytics
+numpy
+opencv-python-headless
+werkzeug
