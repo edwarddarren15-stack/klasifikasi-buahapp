@@ -20,6 +20,15 @@ os.makedirs(
     exist_ok=True
 )
 
+# --- Trik bypass error quantization_config Keras ---
+from keras.src.layers.core.dense import Dense
+original_dense_init = Dense.__init__
+def patched_dense_init(self, *args, **kwargs):
+    kwargs.pop('quantization_config', None) # Buang parameter penyebab error jika ada
+    original_dense_init(self, *args, **kwargs)
+Dense.__init__ = patched_dense_init
+# --------------------------------------------------
+
 #load model
 MODEL_PATH = "model/model_klasifikasi_buah_final_v2.keras"
 
